@@ -1,0 +1,47 @@
+#### Abnormalities:
+
+- negative prices
+- negative quantities
+- null and duplicate values
+- The price varies for the same stockCode
+
+#### Assumptions:
+
+- The provided price is a unit price
+- assumed that StockCode should be num+uppercase characters
+- The price varies for the same stock 
+- Assumed that the price does not only depend on the stockcode
+- The same invoice can include multiple items
+
+
+#### Proposed aggregations:
+
+
+# TOP 20 revenue by product
+
+SELECT TOP 20  SUM(f.total_price) as total_sales, SUM(f.quantity) as total_quantity, s.stockcode, s.description
+FROM invoices_f f
+JOIN Stock_d s on f.stockcode_key = s.stockcode_key
+GROUP BY s.stockcode, s.description 
+ORDER BY total_sales DESC
+
+
+# Total Sales by month
+
+SELECT d.month, SUM(f.total_price) AS total_sales
+FROM invoices_f f
+JOIN Date_d d ON d.invoicedate_key = f.invoicedate_key
+GROUP BY d.month
+ORDER BY total_sales desc
+
+# Customer count by country
+
+SELECT count(f.customer_key) customer_count, ctr.country from invoices_f f
+JOIN Country_d ctr ON f.country_key = ctr.country_key 
+JOIN Customer_d c ON f.customer_key = c.customer_key
+GROUP BY ctr.country
+ORDER by customer_count desc
+
+
+
+

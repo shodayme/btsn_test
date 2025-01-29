@@ -1,0 +1,44 @@
+
+services:
+  mssql_db:
+    image: mcr.microsoft.com/mssql/server:2022-CU17-ubuntu-22.04	
+    container_name: mssql_db
+    volumes:
+      - ./database/data:/var/opt/mssql
+      - ./database/db_init:/tmp/db_init
+      - ./database/logs:/var/opt/mssql/log
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Test_password1$
+      - MSSQL_PID=Developer
+    network_mode: "host"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -C -U sa -P Test_password1$ -d InvoicesDB -Q 'SELECT 1'"]
+      start_period: 30s
+      interval: 35s
+      timeout: 5s
+      retries: 5
+    entrypoint: > 
+      /bin/bash -c "
+      /opt/mssql/bin/sqlservr &
+      sleep 30 && 
+      /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Test_password1$ -C -i /tmp/db_init/invoice_db_init.sql && 
+      wait
+      "
+
+  data_processor:
+    build:
+      context: .
+      dockerfile: data_processor/data_processor.dockerfile
+    container_name: data_process
+    environment:
+      - INPUT_PATH
+    volumes:
+      - ./logs:/app/logs
+      - ./input_data:/app/input_data
+    depends_on:
+      mssql_db:
+        condition: service_healthy
+    network_mode: "host"
