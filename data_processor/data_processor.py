@@ -128,7 +128,6 @@ class DataProcessor():
                                         AND ctr.country_key = f.country_key
                                         AND f.invoice = raw.invoice
                                  )
-                                 returning 
                                 """)
                     conn.execution_options(autocommit=True).execute(query)
                     self.logger.info(">>> Fact table successfully populated")
