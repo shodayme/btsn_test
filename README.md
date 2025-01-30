@@ -28,7 +28,7 @@
 
 `git clone https://github.com/shodayme/btsn_test.git`
 
-`cd bettson_test`
+`cd btsn_test`
 
 #### build the docker images
 
