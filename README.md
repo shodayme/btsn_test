@@ -15,7 +15,7 @@
 >Extra information on the assignment are on the notes file
 
 ### Data Model
-
+![](diagrams/dw_model.png)
 ### Prerequisites
 
     Docker
